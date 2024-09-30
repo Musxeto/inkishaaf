@@ -55,10 +55,18 @@ const NewArticle = () => {
   };
 
   const handleImageUpload = async (index, file) => {
-    const storageRef = ref(storage, `images/${file.name}`);
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
-    handleContentChange(index, 'text', url); // Store the image URL in content
+    if (file) {
+      try {
+        const storageRef = ref(storage, `images/${file.name}`);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        handleContentChange(index, 'text', url); // Store the image URL in content
+      } catch (error) {
+        console.error('Error uploading image: ', error);
+      }
+    } else {
+      console.warn('No file selected for upload at index: ', index);
+    }
   };
 
   return (
@@ -88,11 +96,12 @@ const NewArticle = () => {
             <option value="image">Image</option>
             <option value="list">List</option>
           </select>
+
           {item.type === 'image' ? (
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => handleImageUpload(index, e.target.files[0])}
+              onChange={(e) => handleImageUpload(index, e.target.files[0])} // Pass correct index for image field
               className="border border-gray-600 p-2 w-full bg-gray-700 text-white"
               required
             />
@@ -114,10 +123,11 @@ const NewArticle = () => {
           </button>
         </div>
       ))}
+      
       <button type="button" onClick={handleAddContent} className="bg-green-500 text-white p-2 mb-4 rounded">
         Add Content
       </button>
-      
+
       <div className="mb-4">
         <label className="block mb-1">Date:</label>
         <input

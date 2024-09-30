@@ -15,6 +15,7 @@ const AllRoutes = () => {
       <div>
         {/* Routes for different pages */}
         <Routes>
+          <Route path="/login" element={<Login />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/articles/:date" element={<ArticleList />} />
           <Route
@@ -47,15 +48,6 @@ const AllRoutes = () => {
               <PrivateRoute>
                 <Settings />
               </PrivateRoute>
-            }
-          />
-
-          <Route
-            path="/login"
-            element={
-              <LoginRoute>
-                <Login />
-              </LoginRoute>
             }
           />
         </Routes>

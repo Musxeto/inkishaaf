@@ -1,10 +1,7 @@
-import { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Header from '../Header';
-import Sidebar from './Sidebar';
-import NewArticle from './NewArticle';
-import ManageArticles from './ManageArticles';
-import Settings from './Settings';
+import Header from "../Header";
+import { Link } from "react-router-dom";
+import Sidebar from "./Sidebar";
+import { FaPen, FaBook, FaCog } from "react-icons/fa";
 
 const AdminPortal = () => {
   return (
@@ -12,8 +9,26 @@ const AdminPortal = () => {
       <Sidebar />
       <div className="flex-grow p-4">
         <Header />
-        <h3>welcome</h3>
-       <p>whats the vision for today?</p>
+        <h3>Welcome</h3>
+        <p>What's the vision for today?</p>
+        <br />
+        <ul>
+          <li className="mb-2 underline">
+            <Link to="/admin/new-article" className="text-black flex items-center">
+              Add New Article <FaPen className="ml-2" />
+            </Link>
+          </li>
+          <li className="mb-2 underline">
+            <Link to="/admin/manage-articles" className="text-black flex items-center">
+              Manage Articles <FaBook className="ml-2" />
+            </Link>
+          </li>
+          <li className="mb-2 underline">
+            <Link to="/admin/settings" className="text-black flex items-center">
+              Settings <FaCog className="ml-2" />
+            </Link>
+          </li>
+        </ul>
       </div>
     </div>
   );
