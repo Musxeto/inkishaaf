@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Header from './Header';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../firebase'; // Adjust the import path as necessary
+import { db } from '../firebase'; 
 import { collection, getDocs } from 'firebase/firestore';
 
 const HomePage = () => {
@@ -16,9 +16,9 @@ const HomePage = () => {
   // Fetch unique dates from Firestore
   const fetchDates = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'articles'));
-      const allDates = querySnapshot.docs.map(doc => doc.data().date); // Adjust according to your data structure
-      
+      const querySnapshot = await getDocs(collection(db, 'dates'));
+      const allDates = querySnapshot.docs.map(doc => doc.data().date);
+
       // Create a unique set of dates and sort them in decreasing order
       const uniqueDates = [...new Set(allDates)].sort((a, b) => new Date(b) - new Date(a));
       setDates(uniqueDates);

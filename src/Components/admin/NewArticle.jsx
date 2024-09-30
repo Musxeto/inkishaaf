@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { db } from '../../firebase'; // Adjust the import path as necessary
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { storage } from '../../firebase'; // Adjust the import path for storage
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 
 const NewArticle = () => {
   const [title, setTitle] = useState('');
@@ -27,6 +27,20 @@ const NewArticle = () => {
     setContent(newContent);
   };
 
+  const checkAndAddDate = async (date) => {
+    const dateRef = collection(db, 'dates');
+    const dateSnapshot = await getDocs(dateRef);
+    const existingDates = dateSnapshot.docs.map(doc => doc.data().date);
+
+    
+    if (!existingDates.includes(date)) {
+      await addDoc(dateRef, { date }); 
+      toast.success('Date added successfully!');
+    } else {
+      toast.info('Date already exists.');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -40,6 +54,7 @@ const NewArticle = () => {
 
     try {
       await addDoc(collection(db, 'articles'), newArticle);
+      await checkAndAddDate(date); // Check and add the date after submitting the article
       console.log('Article added successfully!');
 
       // Reset form
@@ -49,6 +64,7 @@ const NewArticle = () => {
       setPostedBy('');
     } catch (error) {
       console.error('Error adding article: ', error);
+      toast.error('Error adding article.');
     } finally {
       setLoading(false);
     }
@@ -63,6 +79,7 @@ const NewArticle = () => {
         handleContentChange(index, 'text', url); // Store the image URL in content
       } catch (error) {
         console.error('Error uploading image: ', error);
+        toast.error('Error uploading image.');
       }
     } else {
       console.warn('No file selected for upload at index: ', index);
@@ -123,7 +140,7 @@ const NewArticle = () => {
           </button>
         </div>
       ))}
-      
+
       <button type="button" onClick={handleAddContent} className="bg-green-500 text-white p-2 mb-4 rounded">
         Add Content
       </button>

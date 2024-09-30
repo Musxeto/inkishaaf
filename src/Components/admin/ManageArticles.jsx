@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { ToastContainer, toast } from 'react-toastify';
+import EditArticleModal from './EditArticleModal';
 
 const ManageArticles = () => {
   const [articles, setArticles] = useState([]);
   const [date, setDate] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedArticle, setSelectedArticle] = useState(null);
 
   useEffect(() => {
     const fetchArticles = async () => {
-      const articlesCollection = collection(db, 'articles'); // Change 'articles' to your collection name
+      const articlesCollection = collection(db, 'articles');
       const articleDocs = await getDocs(articlesCollection);
       setArticles(articleDocs.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     };
@@ -17,8 +21,19 @@ const ManageArticles = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    await deleteDoc(doc(db, 'articles', id)); // Change 'articles' to your collection name
+    await deleteDoc(doc(db, 'articles', id));
     setArticles(articles.filter(article => article.id !== id));
+    toast.error('Article deleted successfully!');
+  };
+
+  const handleEdit = (article) => {
+    setSelectedArticle(article);
+    setIsEditing(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditing(false);
+    setSelectedArticle(null);
   };
 
   return (
@@ -39,11 +54,18 @@ const ManageArticles = () => {
             <span>{article.title} ({article.date}) - Posted by: {article.postedBy}</span>
             <div>
               <button onClick={() => handleDelete(article.id)} className="bg-red-500 text-white p-1 mr-2">Delete</button>
-              <button onClick={() => console.log('Edit:', article.id)} className="bg-yellow-500 text-white p-1">Edit</button>
+              <button onClick={() => handleEdit(article)} className="bg-yellow-500 text-white p-1">Edit</button>
             </div>
           </li>
         ))}
       </ul>
+     
+      <EditArticleModal
+        isOpen={isEditing} 
+        onClose={closeEditModal} 
+        article={selectedArticle} 
+      />
+      <ToastContainer />
     </div>
   );
 };
