@@ -138,7 +138,6 @@ const ArticleList = () => {
           </ul>
         </div>
       </div>
-      <Footer />
     </>
   );
 };
