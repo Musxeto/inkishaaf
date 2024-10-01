@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import Header from "./Header";
 import { db } from "../firebase"; // Adjust the import path as necessary
 import { collection, query, where, getDocs } from "firebase/firestore";
+import Footer from "./Footer";
 
 const ArticleList = () => {
   const { date } = useParams();
@@ -39,93 +40,104 @@ const ArticleList = () => {
     fetchArticles(); // Fetch articles on component mount
   }, [date]);
 
-  return (
-    <div className="min-h-screen bg-white p-4 md:p-6 font-garamond">
-      <Header />
-      <div className="text-left my-6">
-        <h2 className="text-lg sm:text-xl md:text-2xl text-black">{date}</h2>
-      </div>
+  const getInitials = (name) => {
+    const names = name.split(" ");
+    return names.map((n) => n.charAt(0)).join(". ") + ".";
+  };
 
-      <div className="max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl">
-        <ul className="list-disc pl-5">
-          {articles.map((article, index) => (
-            <li key={index} className="mb-4">
-              <h3
-                className="sm:text-lg md:text-xl cursor-pointer hover:text-gray-600"
-                onClick={() => toggleExpand(index)}
-              >
-                {article.title}
-              </h3>
-              {article.expanded && (
-                <div className="text-gray-700 mt-1">
-                  {Array.isArray(article.content) &&
-                  article.content.length > 0 ? (
-                    article.content.map((block, blockIndex) => {
-                      if (block.type === "heading") {
-                        return (
-                          <h4 key={blockIndex} className="font-bold mt-4">
-                            {block.text}
-                          </h4>
-                        );
-                      }
-                      if (block.type === "subheading") {
-                        return (
-                          <h5 key={blockIndex} className="font-bold mt-4">
-                            {block.text}
-                          </h5>
-                        );
-                      }
-                      if (block.type === "paragraph") {
-                        return (
-                          <p key={blockIndex} className="mt-2">
-                            {block.text}
-                          </p>
-                        );
-                      }
-                      if (block.type === "image") {
-                        return (
-                          <img
-                            key={blockIndex}
-                            src={block.text}
-                            alt={block.alt}
-                            className="my-2 w-48"
-                          />
-                        );
-                      }
-                      if (block.type === "list") {
-                        return (
-                          <ul key={blockIndex} className="list-disc pl-5">
-                            {Array.isArray(block.items) &&
-                              block.items.map((item, itemIndex) => (
-                                <li key={itemIndex} className="mt-1">
-                                  {item}
-                                </li>
-                              ))}
-                          </ul>
-                        );
-                      }
-                      if (block.type === "quote") {
-                        return (
-                          <blockquote
-                            key={blockIndex}
-                            className="border-l-4 border-gray-300 pl-4 italic my-2"
-                          >
-                            {block.text}
-                          </blockquote>
-                        );
-                      }
-                      return null; // Fallback for unknown types
-                    })
-                  ) : (
-                    <p>No content available for this article.</p> // Handle case with no content
-                  )}
+  return (
+    <>
+      <div className="min-h-screen bg-white p-4 md:p-6 font-garamond">
+        <Header />
+        <div className="text-left my-6">
+          <h2 className="text-lg sm:text-xl md:text-2xl text-black">{date}</h2>
+        </div>
+
+        <div className="max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl">
+          <ul className="list-disc pl-5">
+            {articles.map((article, index) => (
+              <li key={index} className="mb-4">
+                <h3
+                  className="sm:text-lg md:text-xl cursor-pointer hover:text-gray-600"
+                  onClick={() => toggleExpand(index)}
+                >
+                  {article.title}
+                </h3>
+                {article.expanded && (
+                  <div className="text-gray-700 mt-1">
+                    {Array.isArray(article.content) &&
+                    article.content.length > 0 ? (
+                      article.content.map((block, blockIndex) => {
+                        if (block.type === "heading") {
+                          return (
+                            <h4 key={blockIndex} className="font-bold mt-4">
+                              {block.text}
+                            </h4>
+                          );
+                        }
+                        if (block.type === "subheading") {
+                          return (
+                            <h5 key={blockIndex} className="font-bold mt-4">
+                              {block.text}
+                            </h5>
+                          );
+                        }
+                        if (block.type === "paragraph") {
+                          return (
+                            <p key={blockIndex} className="mt-2">
+                              {block.text}
+                            </p>
+                          );
+                        }
+                        if (block.type === "image") {
+                          return (
+                            <img
+                              key={blockIndex}
+                              src={block.text}
+                              alt={block.alt}
+                              className="my-2 w-48"
+                            />
+                          );
+                        }
+                        if (block.type === "list") {
+                          return (
+                            <ul key={blockIndex} className="list-disc pl-5">
+                              {Array.isArray(block.items) &&
+                                block.items.map((item, itemIndex) => (
+                                  <li key={itemIndex} className="mt-1">
+                                    {item}
+                                  </li>
+                                ))}
+                            </ul>
+                          );
+                        }
+                        if (block.type === "quote") {
+                          return (
+                            <blockquote
+                              key={blockIndex}
+                              className="border-l-4 border-gray-300 pl-4 italic my-2"
+                            >
+                              {block.text}
+                            </blockquote>
+                          );
+                        }
+                        return null; // Fallback for unknown types
+                      })
+                    ) : (
+                      <p>No content available for this article.</p> // Handle case with no content
+                    )}
+                  </div>
+                )}
+                <div className="text-right mt-2 text-gray-500">
+                  Posted by {getInitials(article.postedBy)}
                 </div>
-              )}
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 
