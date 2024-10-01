@@ -66,9 +66,6 @@ const ArticleList = () => {
                 {article.expanded && (
                   <div className="text-gray-700 mt-1">
                     {/* Move the "posted by" information inside the expanded section */}
-                    <p className="italic text-sm text-gray-500">
-                      Posted by: {getInitials(article.postedBy)}
-                    </p>
 
                     {Array.isArray(article.content) &&
                     article.content.length > 0 ? (
@@ -131,6 +128,9 @@ const ArticleList = () => {
                     ) : (
                       <p>No content available for this article.</p> // Handle case with no content
                     )}
+                    <p className="italic text-sm text-gray-500">
+                      Posted by: {getInitials(article.postedBy)}
+                    </p>
                   </div>
                 )}
               </li>
