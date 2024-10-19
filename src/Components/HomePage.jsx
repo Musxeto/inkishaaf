@@ -9,6 +9,7 @@ const HomePage = () => {
   const [dates, setDates] = useState([]);
   const [filter, setFilter] = useState("");
   const [selectedTab, setSelectedTab] = useState("articles");
+  const [currentTime, setCurrentTime] = useState(""); 
   const navigate = useNavigate();
 
   const handleFilterChange = (e) => setFilter(e.target.value);
@@ -34,8 +35,21 @@ const HomePage = () => {
     }
   };
 
+  // Function to update the current time
+  const updateTime = () => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    const milliseconds = String(now.getMilliseconds()).padStart(2, "0");
+    setCurrentTime(`${hours}:${minutes}:${seconds}:${milliseconds}`);
+  };
+
+  // Start the clock when the component mounts
   useEffect(() => {
     fetchDates(); // Fetch dates on component mount or tab change
+    const interval = setInterval(updateTime, 100); // Update time every 100 ms
+    return () => clearInterval(interval); // Cleanup on unmount
   }, [selectedTab]);
 
   return (
@@ -87,6 +101,9 @@ const HomePage = () => {
               </li>
             ))}
           </ul>
+
+          {/* Display the current time */}
+          <div className="mt-4 text-lg text-black">{currentTime}</div>
         </div>
       </div>
       <Footer />
