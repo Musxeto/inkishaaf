@@ -6,13 +6,20 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import Footer from "./Footer";
 
 const ArticleList = () => {
-  const { date } = useParams();
+  const { date, selectedTab } = useParams(); // Fetch selectedTab from params
   const [articles, setArticles] = useState([]);
 
-  // Fetch articles for the selected date
+  // Fetch articles for the selected date and tab
   const fetchArticles = async () => {
     try {
-      const articlesRef = collection(db, "articles");
+      const articlesRef = collection(
+        db,
+        selectedTab === "articles"
+          ? "articles"
+          : selectedTab === "news"
+          ? "news"
+          : "poetry"
+      );
       const q = query(articlesRef, where("date", "==", date));
       const querySnapshot = await getDocs(q);
 
@@ -37,8 +44,8 @@ const ArticleList = () => {
   };
 
   useEffect(() => {
-    fetchArticles(); // Fetch articles on component mount
-  }, [date]);
+    fetchArticles();
+  }, [date, selectedTab]);
 
   const getInitials = (name) => {
     const names = name.split(" ");
@@ -101,6 +108,17 @@ const ArticleList = () => {
                             />
                           );
                         }
+                        if (block.type === "stanza") {
+                          return (
+                            <div key={blockIndex} className="my-2 italic">
+                              {block.text.split("\n").map((line, lineIndex) => (
+                                <p key={lineIndex} className="mt-1">
+                                  {line}
+                                </p>
+                              ))}
+                            </div>
+                          );
+                        }
                         if (block.type === "list") {
                           return (
                             <ul key={blockIndex} className="list-disc pl-5">
@@ -113,6 +131,7 @@ const ArticleList = () => {
                             </ul>
                           );
                         }
+
                         if (block.type === "quote") {
                           return (
                             <blockquote

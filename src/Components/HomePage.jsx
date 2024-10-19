@@ -8,19 +8,23 @@ import Footer from "./Footer";
 const HomePage = () => {
   const [dates, setDates] = useState([]);
   const [filter, setFilter] = useState("");
+  const [selectedTab, setSelectedTab] = useState("articles");
   const navigate = useNavigate();
 
   const handleFilterChange = (e) => setFilter(e.target.value);
 
   const filteredDates = dates.filter((date) => date.includes(filter));
 
-  // Fetch unique dates from Firestore
   const fetchDates = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "dates"));
+      let collectionName;
+      if (selectedTab === "articles") collectionName = "dates";
+      if (selectedTab === "news") collectionName = "dates_news";
+      if (selectedTab === "poetry") collectionName = "dates_poetry";
+
+      const querySnapshot = await getDocs(collection(db, collectionName));
       const allDates = querySnapshot.docs.map((doc) => doc.data().date);
 
-      // Create a unique set of dates and sort them in decreasing order
       const uniqueDates = [...new Set(allDates)].sort(
         (a, b) => new Date(b) - new Date(a)
       );
@@ -31,14 +35,32 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-    fetchDates(); // Fetch dates on component mount
-  }, []);
+    fetchDates(); // Fetch dates on component mount or tab change
+  }, [selectedTab]);
 
   return (
     <>
       <div className="min-h-screen bg-white p-4 md:p-6 font-garamond font-light">
         <Header />
         <div className="max-w-lg lg:max-w-4xl xl:max-w-6xl">
+          {/* Tab Selection */}
+          <div className="flex space-x-4 mb-4">
+            {["articles", "news", "poetry"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setSelectedTab(tab)}
+                className={`text-lg ${
+                  selectedTab === tab
+                    ? "text-black border-b-2 border-black"
+                    : "text-gray-500"
+                }`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          {/* Date Filter */}
           <div className="flex items-center mb-4">
             <label htmlFor="dateFilter" className="text-lg text-black mr-2">
               DATE:
@@ -53,12 +75,13 @@ const HomePage = () => {
             />
           </div>
 
+          {/* Display Filtered Dates */}
           <ul className="none">
             {filteredDates.map((date, index) => (
               <li
                 key={index}
                 className="p-1 cursor-pointer text-left text-lg"
-                onClick={() => navigate(`/articles/${date}`)}
+                onClick={() => navigate(`/articles/${selectedTab}/${date}`)}
               >
                 {date}
               </li>

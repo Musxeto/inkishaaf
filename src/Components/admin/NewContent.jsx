@@ -5,12 +5,13 @@ import { storage } from '../../firebase'; // Adjust the import path for storage
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { ToastContainer, toast } from 'react-toastify';
 
-const NewArticle = () => {
+const NewContent = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState([]);
   const [date, setDate] = useState('');
   const [postedBy, setPostedBy] = useState('');
   const [loading, setLoading] = useState(false);
+  const [type, setType] = useState('article'); // Default type
 
   const handleAddContent = () => {
     setContent([...content, { type: 'heading', text: '' }]);
@@ -27,14 +28,13 @@ const NewArticle = () => {
     setContent(newContent);
   };
 
-  const checkAndAddDate = async (date) => {
-    const dateRef = collection(db, 'dates');
+  const checkAndAddDate = async (date, collectionName) => {
+    const dateRef = collection(db, collectionName);
     const dateSnapshot = await getDocs(dateRef);
     const existingDates = dateSnapshot.docs.map(doc => doc.data().date);
 
-    
     if (!existingDates.includes(date)) {
-      await addDoc(dateRef, { date }); 
+      await addDoc(dateRef, { date });
       toast.success('Date added successfully!');
     } else {
       toast.info('Date already exists.');
@@ -52,10 +52,13 @@ const NewArticle = () => {
       postedBy,
     };
 
+    const contentCollection = type === 'news' ? 'news' : type === 'poetry' ? 'poetry' : 'articles';
+    const dateCollection = type === 'news' ? 'dates_news' : type === 'poetry' ? 'dates_poetry' : 'dates';
+
     try {
-      await addDoc(collection(db, 'articles'), newArticle);
-      await checkAndAddDate(date); // Check and add the date after submitting the article
-      console.log('Article added successfully!');
+      await addDoc(collection(db, contentCollection), newArticle);
+      await checkAndAddDate(date, dateCollection); // Check and add the date after submitting
+      console.log('Content added successfully!');
 
       // Reset form
       setTitle('');
@@ -63,8 +66,8 @@ const NewArticle = () => {
       setDate('');
       setPostedBy('');
     } catch (error) {
-      console.error('Error adding article: ', error);
-      toast.error('Error adding article.');
+      console.error('Error adding content: ', error);
+      toast.error('Error adding content.');
     } finally {
       setLoading(false);
     }
@@ -88,7 +91,22 @@ const NewArticle = () => {
 
   return (
     <form onSubmit={handleSubmit} className="bg-gray-800 text-white p-6 rounded shadow-md">
-      <h2 className="text-lg font-bold mb-4">New Article</h2>
+      <h2 className="text-lg font-bold mb-4">New Content</h2>
+      
+      <div className="mb-4">
+        <label className="block mb-1">Type:</label>
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          className="border border-gray-600 p-2 w-full bg-gray-700 text-white"
+          required
+        >
+          <option value="article">Article</option>
+          <option value="news">News</option>
+          <option value="poetry">Poetry</option>
+        </select>
+      </div>
+
       <div className="mb-4">
         <label className="block mb-1">Title:</label>
         <input
@@ -110,6 +128,7 @@ const NewArticle = () => {
             <option value="heading">Heading</option>
             <option value="subheading">Subheading</option>
             <option value="paragraph">Paragraph</option>
+            <option value="stanza">Stanza</option>
             <option value="image">Image</option>
             <option value="list">List</option>
           </select>
@@ -166,11 +185,11 @@ const NewArticle = () => {
         />
       </div>
       <button type="submit" className="bg-blue-600 text-white p-2 rounded">
-        {loading ? 'Submitting...' : 'Submit Article'}
+        {loading ? 'Submitting...' : 'Submit Content'}
       </button>
       <ToastContainer />
     </form>
   );
 };
 
-export default NewArticle;
+export default NewContent;
