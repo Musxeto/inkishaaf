@@ -8,7 +8,7 @@ import Footer from "./Footer";
 const ArticleList = () => {
   const { date, selectedTab } = useParams(); // Fetch selectedTab from params
   const [articles, setArticles] = useState([]);
-
+  const [currentTime, setCurrentTime] = useState("");
   // Fetch articles for the selected date and tab
   const fetchArticles = async () => {
     try {
@@ -45,13 +45,23 @@ const ArticleList = () => {
 
   useEffect(() => {
     fetchArticles();
+    const interval = setInterval(updateTime, 100);
+    return () => clearInterval(interval);
   }, [date, selectedTab]);
 
   const getInitials = (name) => {
     const names = name.split(" ");
     return names.map((n) => n.charAt(0)).join(". ") + ".";
   };
-
+  // Function to update the current time
+  const updateTime = () => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    const milliseconds = String(now.getMilliseconds()).padStart(2, "0");
+    setCurrentTime(`${hours}:${minutes}:${seconds}:${milliseconds}`);
+  };
   return (
     <>
       <div className="min-h-screen bg-white p-4 md:p-6 font-garamond">
@@ -155,6 +165,7 @@ const ArticleList = () => {
               </li>
             ))}
           </ul>
+          <div className="mt-4 text-lg text-black">{currentTime}</div>
         </div>
       </div>
     </>
