@@ -5,7 +5,7 @@ import { storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { ToastContainer, toast } from "react-toastify";
 
-const EditArticleModal = ({ isOpen, onClose, article }) => {
+const EditArticleModal = ({ isOpen, onClose, article, contentType }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState([]);
   const [date, setDate] = useState("");
@@ -49,12 +49,14 @@ const EditArticleModal = ({ isOpen, onClose, article }) => {
       }
     }
   };
-  
+
   const handleEdit = async () => {
-    const articleRef = doc(db, "articles", article.id); // Change 'articles' to your collection name
+    const collectionName = contentType === 'articles' ? 'articles' : contentType === 'news' ? 'news' : 'poetry';
+    const articleRef = doc(db, collectionName, article.id);
+    
     try {
       await updateDoc(articleRef, { title, content, date, postedBy });
-      toast.success("Article updated successfully!");
+      toast.success(`${contentType.charAt(0).toUpperCase() + contentType.slice(1)} updated successfully!`);
       onClose();
     } catch (error) {
       console.error("Error updating article: ", error);
@@ -67,7 +69,7 @@ const EditArticleModal = ({ isOpen, onClose, article }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded shadow-md max-w-lg w-full max-h-[90%] overflow-y-auto">
-        <h2 className="text-lg font-bold mb-4">Edit Article</h2>
+        <h2 className="text-lg font-bold mb-4">Edit {contentType.charAt(0).toUpperCase() + contentType.slice(1)}</h2>
         <div className="mb-4">
           <label className="block">Title:</label>
           <input
@@ -120,7 +122,7 @@ const EditArticleModal = ({ isOpen, onClose, article }) => {
             <button
               type="button"
               onClick={() => handleRemoveContent(index)}
-              className="ml-2 bg-red-600 text-white p-2 rounded"
+              className="bg-red-500 text-white p-1 ml-2"
             >
               Remove
             </button>
@@ -129,11 +131,10 @@ const EditArticleModal = ({ isOpen, onClose, article }) => {
         <button
           type="button"
           onClick={handleAddContent}
-          className="bg-green-500 text-white p-2 mb-4 rounded"
+          className="bg-blue-500 text-white p-2 mb-4"
         >
           Add Content
         </button>
-
         <div className="mb-4">
           <label className="block">Date:</label>
           <input
@@ -152,17 +153,24 @@ const EditArticleModal = ({ isOpen, onClose, article }) => {
             className="border p-2 w-full"
           />
         </div>
-        <button
-          onClick={handleEdit}
-          className="bg-blue-500 text-white p-2 mr-2"
-        >
-          Save
-        </button>
-        <button onClick={onClose} className="bg-gray-500 text-white p-2">
-          Cancel
-        </button>
-        <ToastContainer />
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={handleEdit}
+            className="bg-green-500 text-white p-2 mr-2"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="bg-gray-300 p-2"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };
