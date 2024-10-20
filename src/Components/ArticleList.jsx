@@ -157,9 +157,11 @@ const ArticleList = () => {
                     ) : (
                       <p>No content available for this article.</p> // Handle case with no content
                     )}
-                    <p className="italic text-sm text-gray-500">
-                      Posted by: {getInitials(article.postedBy)}
-                    </p>
+                    {article.postedBy && (
+                      <p className="italic text-sm text-gray-500">
+                        Posted by: {getInitials(article.postedBy)}
+                      </p>
+                    )}
                   </div>
                 )}
               </li>
