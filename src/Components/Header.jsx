@@ -7,10 +7,11 @@ const Header = () => {
 
   useEffect(() => {
     const images = [
-      "/assets/1.png",
-      "/assets/2.png",
-      "/assets/3.png",
-      "/assets/4.png",
+      // "/assets/1.png",
+      // "/assets/2.png",
+      // "/assets/3.png",
+      // "/assets/4.png",
+      "/assets/5.png",
     ];
     const randomIndex = Math.floor(Math.random() * images.length);
     setRandomImage(images[randomIndex]);
@@ -25,7 +26,7 @@ const Header = () => {
         <img
           src={randomImage}
           alt="Header Logo"
-          className="w-full max-w-[100px] h-auto mx-auto z-10"
+          className="w-auto max-w-[100px] h-full mx-auto z-10"
         />
       )}
     </header>
